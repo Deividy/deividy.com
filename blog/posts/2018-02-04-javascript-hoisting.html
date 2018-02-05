@@ -1,0 +1,96 @@
+<div class='minimal'>
+    <h2><a href='<%= link %>'>JavaScript Hoisting</a></h2>
+    <p class='date'>04/02/2018</p>
+    <p>
+        Basicamente, toda definição em JavaScript é 'hoisted' no topo de
+        seu escopo. O que eu quer basiscamente dizer ...
+    </p>
+
+</div>
+
+<div class='full-post'>
+    <h2>JavaScript Hoisting</h2>
+
+    <br />
+    <p>
+        Basicamente, toda definição em JavaScript é 'hoisted' no topo de
+        seu escopo. O que eu quer basicamente dizer que quando usamos um
+        <span class='inline-code'>var foo = 'bar'</span> o compilador JavaScript
+        vai mover o <span class='inline-code'>var foo;</span> no topo da função e
+        a definição do <span class='inline-code'>foo = 'bar'</span> ira ficar
+        onde foi definida.
+    </p>
+
+    <br />
+    <p>Considere o seguinte código:</p>
+
+    <div class='code'>
+    fnExpression(); // => throw TypError!
+    var fnExpression = function() {
+        return "I'm a expression assigned to a variable";
+    }
+    fnExpression(); // => "I'm a expression assigned to a variable"
+
+    fnStatement(); // => "I'm a statement with name"
+
+    fuction fnStatement() {
+        return "I'm a statement with name";
+    }
+
+    fnStatement(); // => "I'm a statement with name"
+
+    var scope = 'global';
+    function fn() {
+        return scope;
+        var scope = 'local';
+    }
+    fn(); // => undefined
+    </div>
+
+    <br />
+
+    <p>Notou algo bem loco por aí?</p>
+    <p>
+        Importante ressaltarmos também que uma <strong>expressão</strong> é
+        diferente de um <strong>statement</strong>, basicamente, no exemplo acima,
+        uma expressão é uma declaração com <span class='inline-code'>var fnExpression = function () {...}</span>,
+        enquanto um statement é <span class='inline-code'>fuction fnStatement() { ... }</span>).
+        Expressōes são 'hoisted' no topo de seu escopo, mas não a sua inicialização,
+        logo no exemplo de <span class='inline-code'>var fnExpression = function () {...}</span>,
+        a <span class='inline-code'>var fnExpression</span> vai para o topo do escopo mas não
+        a sua inicialização, daí quando tentamos usar a função tomamos um
+        <span class='inline-code'>TypeError</span>, por outro lado, statements são
+        hoisted por inteiro e por isso o uso da <span class='inline-code'>fnStatement()</span>
+        funciona antes de sua definição.
+    </p>
+    <br />
+    <p>Para ter uma visualização melhor, é assim que esse código fica do ponto de vista do compilador:</p>
+
+    <div class='code'>
+    var fnExpression, scope;
+    function fnStatement() {
+        return "I'm a statement with name";
+    }
+    function fn() {
+        var scope;
+        return scope;
+        scope = 'local';
+    }
+
+    fnExpression();
+    fnExpression = function() {
+        return "I'm a expression assigned to a variable";
+    }
+    fnExpression();
+
+    fnStatement();
+    fnStatement();
+
+    scope = 'global';
+    fn();
+    </div>
+    <br /><br />
+
+    <p>Eaí, curtiu? Tem dúvidas? Posta-ae! :)</p>
+</div>
+

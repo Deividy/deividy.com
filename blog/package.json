@@ -1,0 +1,10 @@
+{
+    "name": "blog.deividy.com",
+    "description": "my blog, my code, my friends, my life :)",
+    "version": "0.0.01",
+    "dependencies": {
+        "express": "",
+        "lodash": "",
+        "ejs": ""
+    }
+}

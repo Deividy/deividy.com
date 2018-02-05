@@ -1,0 +1,85 @@
+<div class='minimal'>
+    <h2><a href='<%= link %>'>JavaScript Scope Chain</a></h2>
+    <p class='date'>05/02/2018</p>
+    <p>
+        O único jeito de criar escopo em JavaScript é definindo uma função,
+        basicamente, sempre que uma função é definida ela cria um escopo,
+        esse escopo tem uma ligação com o escopo de onde a função foi definida (confusing?)
+        e isso é o que conhecemos como Scope Chain, ou cadeia de escopo ...
+    </p>
+
+</div>
+
+<div class='full-post'>
+    <h2>JavaScript Scope Chain</h2>
+
+    <br />
+    <p>
+        O único jeito de criar escopo em JavaScript é definindo uma função,
+        basicamente, sempre que uma função é definida ela cria um novo escopo,
+        esse escopo tem uma ligação com o escopo de onde a função foi definida (confusing?)
+        e isso é o que conhecemos como Scope Chain, ou cadeia de escopo.
+    </p>
+
+    <br /><br />
+    <p>
+        Por definição <strong>toda</strong> função em JavaScript é um closure,
+        pois são objetos, e tem uma cadeia de escopo associada a elas.
+    </p>
+
+    <p>
+    * Com exceção das arrow functions do ES6 (<span class='inline-code'>() => {}</span>),
+        essas por sua vez, não iniciam um novo escopo, elas herdam o escopo de sua função mãe.
+    </p>
+
+    <br /><br />
+
+    <p>Agora, um pouco de prática para deixar um pouco mais claro:</p>
+
+    <div class='code'>
+    var scope = 'global';
+
+    function fnOuter () {
+        console.log(scope); // > undefined
+        var scope = 'outer';
+
+        return function () {
+            console.log(scope); // > outer
+            scope = 'inner';
+
+            return scope;
+        }();
+    }
+
+    console.log(scope); // > global;
+    console.log(fnOuter()); // > 'inner';
+    console.log(scope); // > global;
+    </div>
+
+    <br />
+
+    <p>Notou algo bem loco por aí?</p>
+    <p>
+        O <span class='inline-code'>console.log(scope);</span> no começo da
+        <span class='inline-code'>fnOuter()</span> retorna
+        <span class='inline-code'>undefined</span> isso é devido as declarações no
+        JavaScript serem todas hoisted (tem um post <a href='/post/2018-02-04-javascript-hoisting.html'>aqui</a> com mais
+        info), então quando definimos uma nova
+        <span class='inline-code'>var</span> nossa variable é 'hoisted' no
+        topo da função e inicializado com
+        <span class='inline-code'>undefined</span>. Cool, huh?
+    </p>
+    <p>
+        Outro detalhe interessante é que como declaramos uma nova variável, a
+        mudança do <span class='inline-code'>scope = 'inner'</span> tem efeito
+        apenas na variável da função <span class='inline-code'>fnOuter()</span> e
+        não mudamos o scope global, usar o mesmo nome de uma função paí ou global
+        <strong>não</strong> é recomendado (não faça isso em seus projetos!) e é
+        conhecido como <strong>variable shadowing</strong>.
+        Usamos aqui apenas para exemplificar a idéia de escopo.
+    </p>
+    <br /><br />
+
+    <p>Eaí, curtiu? Tem dúvidas? Posta-ae! :)</p>
+</div>
+

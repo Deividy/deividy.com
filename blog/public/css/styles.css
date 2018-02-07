@@ -145,6 +145,8 @@ span.inline-code {
     line-height: 150%;
 }
 
+.refs-list { padding-left: 10px; }
+
 @media screen and (max-width: 470px) {
     .footer-item.small-display { display: block; }
     .footer-item.normal-display { display: none; }

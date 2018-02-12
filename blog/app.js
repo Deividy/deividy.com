@@ -23,7 +23,7 @@ async function getPosts (postFiles) {
         if (!/\.html$/.test(filename)) continue;
 
         const fileContent = await readFilePromise(`${__dirname}/posts/${filename}`);
-        const tpl = _.template(fileContent.toString());
+        const tpl = _.template(fileContent.toString().split("<div class='full-post'>")[0]);
 
         const link = `/post/${filename}`;
         posts.push({ html: tpl({ link  }), link });

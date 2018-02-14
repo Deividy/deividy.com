@@ -1,0 +1,275 @@
+<div class='minimal'>
+    <h2><a href='<%= link %>'>3 formas de passar configurações para uma app em Node.js</a></h2>
+    <p class='date'>14/02/2018</p>
+    <p>
+        Hard code? Config file? Environment variables? HELP!?
+    </p>
+
+</div>
+
+<div class='full-post'>
+    <h2>3 formas de passar configurações para uma app em Node.js</h2>
+
+    <br />
+    <p>
+        Falaae #codingninja! :D
+        <br />
+        Vamos ver aqui as 3 formas mais comuns de passar, ou usar,
+        configs em uma app escrita em Node.js:
+    </p>
+
+    <br />
+
+    <p>
+        <strong>1. Hard code</strong>
+    </p>
+    <p>
+        Hard code é provavelmente a forma mais 'suja' de fazer isso, basicamente
+        consiste em você escrever em algum ponto aleatório de sua app as configs
+        dela, não importa se você deixa comentado bonitinho, ainda será a mais
+        suja e vai ficar cada vez mais difícil de escalar, um simples exemplo:
+    </p>
+
+    <div class='code'>
+    // ...
+    const { Client } = require('pg');
+
+    // configs {
+    const httpPort = 9000;
+    const saltRounds = 4;
+    const jwtSecret = 'SECRET! #codeinaction #tmj :D';
+    const psqlConfig = 'postgres://localhost:5432/codeinaction_login_area';
+    // } <-- configs
+
+    const app = express();
+    // ...
+    </div>
+
+    <br />
+    <p>
+        Consegue ver problemas caso usemos um ambiente para dev e outro para prod?
+        Teriamos que colocar alguns ifs malucos aí no meio e o pior poderia ser
+        quando um novo dev entrar para o time,
+        <strong>não faça isso para uma app do mundo real</strong>!
+    </p>
+
+    <br />
+    <br />
+
+    <p>
+        <strong>2. Arquivo de configuração</strong>
+    </p>
+    <p>
+        Outra forma comum de passar configurações é o uso de arquivos específicos
+        de configuração, essa é uma maneira mais limpa que hard code e pode até
+        ser usada para apps em produção desde que seja feito com
+        <strong>prudência</strong> (e amor e carinho :)).
+    </p>
+    <p>
+        Um arquivo de configuração pode ser tanto um <span class='inline-code'>.js</span>
+        ou <span class='inline-code'>.json</span>, aconselho o uso do JavaScript ao
+        invés de JSON pois nesse caso não precisamos nos preocupar com a formatação
+        exata do JSON e ainda podemos usar alguma lógica ali dentro
+        (mas cuidado! não coloque lógicas em arquivos de configurações! Porém, alguma
+        vezes podemos precisar de lógicas bem simples ou até mesmo do uso de vars
+        como <span class='inline-code'>__dirname</span>, nesses casos é
+        aceitável e o JS te da um vantagem.)
+    </p>
+    <br />
+    <p>
+        Um <span class='inline-code'>.js</span>, geralmente se parecerá com isso:
+    </p>
+
+    <div class='code'>
+    module.exports = {
+        publicPath: `${__dirname}/public`,
+        dbConfig: {
+            user: 'foo',
+            password: 'bar',
+            database: 'codeinaction'
+        }
+    }
+    </div>
+    <br />
+
+    <p>
+        Podemos usar arquivos de configurações basicamente de duas formas:
+    </p>
+    <br />
+    <p>
+        1) Pré configurando uma lista de ambientes e arquivos de configurações.
+    </p>
+    <p>
+        2) Passando na command line de inicio do app o caminho para o arquivo de configurações.
+    </p>
+    <br />
+
+    <p>
+        Da primeira forma podemos fazer algo como:
+
+    <div class='code'>
+    const configPath = process.env.NODE_ENV === 'PROD' ? 'config.prod' : 'config.local';
+    const config = require(configPath);
+    </div>
+    <br />
+
+    <p>Ou um pouco mais limpo e com mais opções:</p>
+    <div class='code'>
+    function getConfigPath () {
+        switch (process.env.NODE_ENV) {
+            case 'prod': return 'config.prod';
+            case 'local': return 'config.local';
+            case 'dev': return 'config.dev';
+        }
+
+        throw new Error(`Unknown env ${process.env.NODE_ENV}`);
+    }
+    const config = require(getConfigPath());
+    </div>
+
+    <br />
+    <p>
+        Curiosidade: em ambos os casos estamos usando env vars, você não precisa
+        necessariamente usá-las para carregar o arquivo de config, mas nesse caso
+        você terá que achar outro jeito de identificar o ambiente, o que nos leva
+        a segunda forma de usar arquivos de configurações.
+    </p>
+
+    <br />
+    <p>
+        Passar o path do arquivo de configuração é uma forma ainda mais limpa de
+        passar a config para sua app, evita ifs no código e você pode mover o
+        arquivo de configuração para onde quiser.
+    </p>
+    <p>
+        Para usar essa tática, vamos usar o <span class='inline-code'>process.argv</span>,
+        podemos tanto usar ele direto e parsearmos na mão os args, ou podemos usar algum
+        módulo de forma que podemos passar facilmente um
+        <span class='inline-code'>-c configPath</span>.
+    </p>
+    <br />
+    <p>
+        Vamos ver um simples exemplo usando o
+        <a href='https://github.com/substack/minimist'>minimist</a>:
+    </p>
+
+    <div class='code'>
+    const argv = require('minimist')(process.argv.slice(2));
+    const config = require(argv.c);
+    </div>
+    <br />
+
+    <p>A usage ficaria assim:</p>
+    <div class='code'>
+    node app.js -c /my-config-path/is-here/config.local.js
+    </div>
+
+    <br />
+    <p>Mais fácil, né?</p>
+
+    <br />
+    <br />
+
+    <p>
+        <strong>3. Variáveis de Ambiente</strong>
+    </p>
+
+    <p>
+        Variável de ambiente se tornou um padrão na comunidade Node.js,
+        principalmente com o surgimento de containers como o Docker.
+    </p>
+    <p>
+        Definição de variável de ambiente segundo
+        <a href='https://pt.wikipedia.org/wiki/Vari%C3%A1vel_de_ambiente'>Wikipedia</a>:
+        "Variável de ambiente é uma variável de um sistema operacional que geralmente
+        contém informações sobre o sistema, caminhos de diretórios específicos no sistema
+        de arquivos e as preferências do utilizador. Ela pode afetar a forma como um processo se
+        comporta, e cada processo pode ler e escrever variáveis de ambiente".
+    </p>
+    <br />
+    <p>
+        Na construção de containers, fica mais fácil simplesmente passar as variáveis
+        de ambiente do que ter que se preocupar com command line ou arquivos de
+        configuração, outra vantagem é que você pode tanto usar algum modulo 
+        (como o <a href='https://github.com/motdotla/dotenv'>dotenv</a>) para carregar 
+        um arquivo chamado <span class='inline-code'>.env</span> ou definir diretamente
+        no seu ambiente.
+    </p>
+    <br />
+
+    <p>
+        Uma prática comum para o uso de env vars é comitarmos no repo um file
+        chamado <span class='inline-code'>.env.sample</span>, com um exemplo
+        de todas as variáveis que tem que ser configurada e deixar no
+        <span class='inline-code'>.gitignore</span> o <span class='inline-code'>.env</span>,
+        dessa forma, todo dev que for trabalhar no projeto ou ambiente que for
+        configurado, basta copiarmos esse file e editar para as configurações
+        específicas.
+    </p>
+    <br />
+
+    <p>Um <span class='inline-code'>.env</span> file se parece com:</p>
+    <div class='code'>
+    DB_HOST=localhost
+    DB_USER=root
+    DB_PASS=s1mpl3
+    </div>
+
+    <br />
+    <p>
+        E caso você esteja usando o dotenv, a única coisa que você vai ter que
+        fazer para carregar esse arquivo vai ser:
+    </p>
+    <div class='code'>
+    require('dotenv').config()
+    </div>
+
+    <br />
+    <p>That's it!</p>
+
+    <p>
+        Caso você não queira usar um arquivo, você pode definir as vars diretamente,
+        em um sistema UNIX (OSX/Linux), basta você mandar diretamente no console:
+    </p>
+
+    <div class='code'>
+    export DB_HOST=localhost
+    export DB_USER=root
+    export DB_PASS=s1mpl3
+    </div>
+
+    <br />
+    <p>
+        Porém, dessa forma as variáveis ficam disponíveis apenas para a sessão
+        atual, caso você feche a janela ou reinicie, elas vão sumir, você ainda
+        pode colocar elas em seu <span class='inline-code'>.bashrc</span>
+    </p>
+    <br />
+
+    <p>
+        Todas as variáveis de ambiente ficam disponíveis no Node.js pelo
+        <span class='inline-code'>process.env</span>, exemplo:</p>
+    </p>
+
+    <div class='code'>
+    db.connect({
+        host: process.env.DB_HOST,
+        username: process.env.DB_USER,
+        password: process.env.DB_PASS
+    })
+    </div>
+
+    <br />
+    <p>
+        São essas as opções para passar configs para o Node.
+    </p>
+        <br /><br />
+    <p>
+        Tem alguma outra forma que não citei aqui?  Prefere env vars a config files? Você é um vida loka que usa hard coded?
+    </p>
+        <br />
+    <p>
+        Comenta ae, vamos trocar uma idéia :)
+    </p>
+</div>
+
